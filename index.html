@@ -31,7 +31,7 @@
   }
   .wrap{max-width:720px;margin:0 auto;position:relative;z-index:1;}
   h2,h3{font-family:'Inter',sans-serif;margin:0;font-weight:600;}
-  .head{border-bottom:1px solid var(--border);padding-bottom:24px;margin-bottom:32px;display:flex;justify-content:space-between;align-items:flex-start;gap:16px;}
+  .head{border-bottom:1px solid var(--border);padding-bottom:24px;margin-bottom:20px;display:flex;justify-content:space-between;align-items:flex-start;gap:16px;}
   .head-text h1{font-family:'Fraunces',serif;font-size:34px;font-weight:600;color:var(--text);letter-spacing:-.01em;margin:0;}
   .head-text p{color:var(--muted);font-size:14.5px;margin-top:10px;max-width:52ch;}
   .mono{font-family:'IBM Plex Mono',monospace;}
@@ -40,6 +40,13 @@
   .lang-toggle button{background:var(--panel-2);color:var(--muted);border:none;border-radius:0;padding:6px 10px;font-size:12px;font-family:'IBM Plex Mono',monospace;font-weight:400;}
   .lang-toggle button.active{background:var(--song);color:#1a1305;font-weight:500;}
   .lang-toggle button + button{border-left:1px solid var(--border);}
+
+  .tabs{display:flex;gap:22px;margin-bottom:28px;border-bottom:1px solid var(--border);}
+  .tab-btn{background:none;border:none;border-radius:0;color:var(--muted);padding:10px 2px;font-size:14px;font-weight:600;font-family:'Inter',sans-serif;border-bottom:2px solid transparent;cursor:pointer;}
+  .tab-btn.active{color:var(--text);border-bottom-color:var(--song);}
+  .tab-btn:hover{filter:none;color:var(--text);}
+  .tab-panel{display:none;}
+  .tab-panel.active{display:block;}
 
   .timeline-card{background:var(--panel);border:1px solid var(--border);border-radius:5px;padding:20px;margin-bottom:28px;}
   .timeline-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:14px;}
@@ -114,7 +121,7 @@
   <div class="head">
     <div class="head-text">
       <h1>Scene Assets</h1>
-      <p data-i18n="tagline">Chain the announcement, your song, and the outro into one mp3 for your Roblox experience. If the mix runs past 7 minutes, the outro gets trimmed to fit.</p>
+      <p data-i18n="tagline">Made whit love.</p>
     </div>
     <div class="lang-toggle" id="langToggle">
       <button data-lang="en">EN</button>
@@ -122,78 +129,132 @@
     </div>
   </div>
 
-  <div class="timeline-card">
-    <div class="timeline-head">
-      <h3 data-i18n="timelineHeading">Timeline</h3>
-      <span id="totalLabel" class="timeline-total mono">00:00 / 07:00</span>
-    </div>
-    <div class="bar" id="bar">
-      <div class="seg tts" id="segTts" style="width:0%"></div>
-      <div class="seg song" id="segSong" style="width:0%"></div>
-      <div class="seg outro" id="segOutro" style="width:0%"></div>
-    </div>
-    <div class="legend">
-      <span><i class="dot tts"></i>TTS</span>
-      <span><i class="dot song"></i><span data-i18n="legendSong">Your song</span></span>
-      <span><i class="dot outro"></i>Outro</span>
-    </div>
-    <div class="trim-note mono" id="trimNote"></div>
+  <div class="tabs" id="tabs">
+    <button class="tab-btn active" data-tab="mix" data-i18n="tabMix">Mix</button>
+    <button class="tab-btn" data-tab="intro" data-i18n="tabIntro">Intro</button>
   </div>
 
-  <!-- STEP 1: auto-load from repo -->
-  <div class="step" id="step1">
-    <div class="step-head">
-      <div class="step-head-left"><div class="step-num">1</div><h2 data-i18n="step1Title">Repository audio</h2></div>
-      <button class="secondary" id="reloadBtn" data-i18n="reloadBtn">Reload</button>
+  <!-- ================= MIX TAB ================= -->
+  <div class="tab-panel active" id="panelMix">
+
+    <div class="timeline-card">
+      <div class="timeline-head">
+        <h3 data-i18n="timelineHeading">Timeline</h3>
+        <span id="totalLabel" class="timeline-total mono">00:00 / 07:00</span>
+      </div>
+      <div class="bar" id="bar">
+        <div class="seg tts" id="segTts" style="width:0%"></div>
+        <div class="seg song" id="segSong" style="width:0%"></div>
+        <div class="seg outro" id="segOutro" style="width:0%"></div>
+      </div>
+      <div class="legend">
+        <span><i class="dot tts"></i>TTS</span>
+        <span><i class="dot song"></i><span data-i18n="legendSong">Your song</span></span>
+        <span><i class="dot outro"></i>Outro</span>
+      </div>
+      <div class="trim-note mono" id="trimNote"></div>
     </div>
-    <div class="status" id="loadStatus"></div>
-    <details>
-      <summary data-i18n="detailsSummary">How is this organized in the repository?</summary>
-      <div class="box" id="detailsBox"></div>
-    </details>
+
+    <!-- STEP 1: auto-load from repo -->
+    <div class="step" id="step1">
+      <div class="step-head">
+        <div class="step-head-left"><div class="step-num">1</div><h2 data-i18n="step1Title">Repository audio</h2></div>
+        <button class="secondary" id="reloadBtn" data-i18n="reloadBtn">Reload</button>
+      </div>
+      <div class="status" id="loadStatus"></div>
+      <details>
+        <summary data-i18n="detailsSummary">How is this organized in the repository?</summary>
+        <div class="box" id="detailsBox"></div>
+      </details>
+    </div>
+
+    <!-- STEP 2 -->
+    <div class="step disabled" id="step2">
+      <div class="step-head"><div class="step-head-left"><div class="step-num">2</div><h2 data-i18n="step2Title">Choose the TTS</h2></div></div>
+      <select id="ttsSelect"></select>
+      <audio id="ttsPreview" controls style="display:none;"></audio>
+      <div class="status" id="ttsStatus"></div>
+    </div>
+
+    <!-- STEP 3 -->
+    <div class="step disabled" id="step3">
+      <div class="step-head"><div class="step-head-left"><div class="step-num">3</div><h2 data-i18n="step3Title">Upload your song</h2></div></div>
+      <div class="filepick" id="songPick">
+        <input type="file" id="songInput" accept="audio/*">
+        <div class="fp-hint" data-i18n="filepickHint">Click to choose an mp3/wav</div>
+        <div class="fp-name" id="songName"></div>
+      </div>
+      <audio id="songPreview" controls style="display:none;"></audio>
+      <div class="status" id="songStatus"></div>
+    </div>
+
+    <!-- STEP 4 -->
+    <div class="step disabled" id="step4">
+      <div class="step-head"><div class="step-head-left"><div class="step-num">4</div><h2 data-i18n="step4Title">Choose the outro</h2></div></div>
+      <select id="outroSelect"></select>
+      <audio id="outroPreview" controls style="display:none;"></audio>
+      <div class="status" id="outroStatus"></div>
+    </div>
+
+    <!-- STEP 5 -->
+    <div class="step disabled" id="step5">
+      <div class="step-head"><div class="step-head-left"><div class="step-num">5</div><h2 data-i18n="step5Title">Generate final mp3</h2></div></div>
+      <div class="field-name">
+        <label data-i18n="outNameLabel">File name</label>
+        <input type="text" id="outName" value="roblox_mix">
+      </div>
+      <button class="generate" id="generateBtn" data-i18n="generateBtn">Generate and download</button>
+      <div class="progress-wrap" id="progressWrap"><div class="progress-bar" id="progressBar"></div></div>
+      <div class="status" id="genStatus"></div>
+      <div class="result" id="result">
+        <a id="downloadLink" download="roblox_mix.mp3" data-i18n="downloadLink">Download mp3</a>
+      </div>
+    </div>
+
   </div>
 
-  <!-- STEP 2 -->
-  <div class="step disabled" id="step2">
-    <div class="step-head"><div class="step-head-left"><div class="step-num">2</div><h2 data-i18n="step2Title">Choose the TTS</h2></div></div>
-    <select id="ttsSelect"></select>
-    <audio id="ttsPreview" controls style="display:none;"></audio>
-    <div class="status" id="ttsStatus"></div>
-  </div>
+  <!-- ================= INTRO TAB ================= -->
+  <div class="tab-panel" id="panelIntro">
 
-  <!-- STEP 3 -->
-  <div class="step disabled" id="step3">
-    <div class="step-head"><div class="step-head-left"><div class="step-num">3</div><h2 data-i18n="step3Title">Upload your song</h2></div></div>
-    <div class="filepick" id="songPick">
-      <input type="file" id="songInput" accept="audio/*">
-      <div class="fp-hint" data-i18n="filepickHint">Click to choose an mp3/wav</div>
-      <div class="fp-name" id="songName"></div>
+    <!-- STEP 1 -->
+    <div class="step" id="introStep1">
+      <div class="step-head"><div class="step-head-left"><div class="step-num">1</div><h2 data-i18n="introStep1Title">First audio</h2></div></div>
+      <div class="filepick" id="introAudio1Pick">
+        <input type="file" id="introAudio1Input" accept="audio/*">
+        <div class="fp-hint" data-i18n="filepickHint">Click to choose an mp3/wav</div>
+        <div class="fp-name" id="introAudio1Name"></div>
+      </div>
+      <audio id="introAudio1Preview" controls style="display:none;"></audio>
+      <div class="status" id="introAudio1Status"></div>
     </div>
-    <audio id="songPreview" controls style="display:none;"></audio>
-    <div class="status" id="songStatus"></div>
-  </div>
 
-  <!-- STEP 4 -->
-  <div class="step disabled" id="step4">
-    <div class="step-head"><div class="step-head-left"><div class="step-num">4</div><h2 data-i18n="step4Title">Choose the outro</h2></div></div>
-    <select id="outroSelect"></select>
-    <audio id="outroPreview" controls style="display:none;"></audio>
-    <div class="status" id="outroStatus"></div>
-  </div>
+    <!-- STEP 2 -->
+    <div class="step" id="introStep2">
+      <div class="step-head"><div class="step-head-left"><div class="step-num">2</div><h2 data-i18n="introStep2Title">Second audio</h2></div></div>
+      <div class="filepick" id="introAudio2Pick">
+        <input type="file" id="introAudio2Input" accept="audio/*">
+        <div class="fp-hint" data-i18n="filepickHint">Click to choose an mp3/wav</div>
+        <div class="fp-name" id="introAudio2Name"></div>
+      </div>
+      <audio id="introAudio2Preview" controls style="display:none;"></audio>
+      <div class="status" id="introAudio2Status"></div>
+    </div>
 
-  <!-- STEP 5 -->
-  <div class="step disabled" id="step5">
-    <div class="step-head"><div class="step-head-left"><div class="step-num">5</div><h2 data-i18n="step5Title">Generate final mp3</h2></div></div>
-    <div class="field-name">
-      <label data-i18n="outNameLabel">File name</label>
-      <input type="text" id="outName" value="roblox_mix">
+    <!-- STEP 3 -->
+    <div class="step disabled" id="introStep3">
+      <div class="step-head"><div class="step-head-left"><div class="step-num">3</div><h2 data-i18n="introStep3Title">Generate intro mp3</h2></div></div>
+      <div class="field-name">
+        <label data-i18n="outNameLabel">File name</label>
+        <input type="text" id="introOutName" value="intro_mix">
+      </div>
+      <button class="generate" id="introGenerateBtn" data-i18n="generateBtn">Generate and download</button>
+      <div class="progress-wrap" id="introProgressWrap"><div class="progress-bar" id="introProgressBar"></div></div>
+      <div class="status" id="introGenStatus"></div>
+      <div class="result" id="introResult">
+        <a id="introDownloadLink" download="intro_mix.mp3" data-i18n="downloadLink">Download mp3</a>
+      </div>
     </div>
-    <button class="generate" id="generateBtn" data-i18n="generateBtn">Generate and download</button>
-    <div class="progress-wrap" id="progressWrap"><div class="progress-bar" id="progressBar"></div></div>
-    <div class="status" id="genStatus"></div>
-    <div class="result" id="result">
-      <a id="downloadLink" download="roblox_mix.mp3" data-i18n="downloadLink">Download mp3</a>
-    </div>
+
   </div>
 
 </div>
@@ -203,6 +264,8 @@
 const I18N = {
   en: {
     tagline: "Made whit love.",
+    tabMix: "Mix",
+    tabIntro: "Intro",
     timelineHeading: "Timeline",
     legendSong: "Your song",
     step1Title: "Repository audio",
@@ -231,18 +294,26 @@ const I18N = {
     manifestReady: (t,o) => `Ready: ${t} TTS, ${o} outro files available.`,
     loadFailed: (path, status) => `Could not load ${path} (${status}).`,
     analyzingSong: "Analyzing your song…",
+    analyzingAudio: "Analyzing audio…",
     trimmed: (kept, full) => `The mix was over 7:00, so the outro is trimmed to ${kept} (from ${full}).`,
     noRoomForOutro: "The TTS + your song already add up to more than 7:00, so there won't be room for the outro.",
     missingSelection: "You still need to choose a TTS, song, and outro.",
+    introMissingSelection: "You still need to add both audios.",
     calcDuration: "Calculating final duration…",
     mixing: "Mixing tracks…",
     encoding: "Encoding to mp3 (this can take a few seconds)…",
     done: (d) => `Done · final duration ${d}`,
     error: (msg) => `Error: ${msg}`,
-    defaultFileName: "roblox_mix"
+    defaultFileName: "roblox_mix",
+    introStep1Title: "First audio",
+    introStep2Title: "Second audio",
+    introStep3Title: "Generate intro mp3",
+    introDefaultFileName: "intro_mix"
   },
   es: {
     tagline: "Echo con amor.",
+    tabMix: "Mezcla",
+    tabIntro: "Intro",
     timelineHeading: "Línea de tiempo",
     legendSong: "Tu canción",
     step1Title: "Audios del repositorio",
@@ -271,15 +342,21 @@ const I18N = {
     manifestReady: (t,o) => `Listo: ${t} TTS, ${o} outros disponibles.`,
     loadFailed: (path, status) => `No se pudo cargar ${path} (${status}).`,
     analyzingSong: "Analizando tu canción…",
+    analyzingAudio: "Analizando audio…",
     trimmed: (kept, full) => `La mezcla pasaba de 7:00, así que el outro se recorta a ${kept} (de ${full}).`,
     noRoomForOutro: "El TTS + tu canción ya suman más de 7:00, así que no habrá espacio para el outro.",
     missingSelection: "Falta elegir TTS, canción u outro.",
+    introMissingSelection: "Faltan los dos audios.",
     calcDuration: "Calculando duración final…",
     mixing: "Mezclando pistas…",
     encoding: "Codificando a mp3 (puede tardar unos segundos)…",
     done: (d) => `Listo · duración final ${d}`,
     error: (msg) => `Error: ${msg}`,
-    defaultFileName: "mezcla_roblox"
+    defaultFileName: "mezcla_roblox",
+    introStep1Title: "Primer audio",
+    introStep2Title: "Segundo audio",
+    introStep3Title: "Generar mp3 de intro",
+    introDefaultFileName: "intro_mezcla"
   }
 };
 
@@ -307,19 +384,35 @@ function applyLang(lang){
   document.querySelectorAll('#langToggle button').forEach(b => {
     b.classList.toggle('active', b.getAttribute('data-lang') === lang);
   });
+
   const outName = document.getElementById('outName');
   if(!outName.dataset.userEdited) outName.value = dict.defaultFileName;
-  const dlLink = document.getElementById('downloadLink');
-  dlLink.download = (outName.value || dict.defaultFileName) + '.mp3';
+  document.getElementById('downloadLink').download = (outName.value || dict.defaultFileName) + '.mp3';
+
+  const introOutName = document.getElementById('introOutName');
+  if(!introOutName.dataset.userEdited) introOutName.value = dict.introDefaultFileName;
+  document.getElementById('introDownloadLink').download = (introOutName.value || dict.introDefaultFileName) + '.mp3';
 }
 
 document.getElementById('outName').addEventListener('input', (e) => { e.target.dataset.userEdited = '1'; });
+document.getElementById('introOutName').addEventListener('input', (e) => { e.target.dataset.userEdited = '1'; });
 
 document.querySelectorAll('#langToggle button').forEach(btn => {
   btn.addEventListener('click', () => applyLang(btn.getAttribute('data-lang')));
 });
 
-/* ---------------- app ---------------- */
+/* ---------------- tabs ---------------- */
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const tab = btn.getAttribute('data-tab');
+    document.getElementById('panelMix').classList.toggle('active', tab === 'mix');
+    document.getElementById('panelIntro').classList.toggle('active', tab === 'intro');
+  });
+});
+
+/* ---------------- shared helpers ---------------- */
 const MAX_SECONDS = 7 * 60;
 const TTS_DIR = 'tts';
 const OUTRO_DIR = 'outro';
@@ -331,8 +424,6 @@ function getCtx(){
   return audioCtx;
 }
 
-const state = { tts:null, song:null, outro:null };
-
 function fmtTime(s){
   s = Math.max(0, Math.round(s));
   const m = Math.floor(s/60);
@@ -343,6 +434,85 @@ function setStatus(el, msg, cls){ el.textContent = msg; el.className = 'status' 
 function enableStep(id){ document.getElementById(id).classList.remove('disabled'); }
 function disableStep(id){ document.getElementById(id).classList.add('disabled'); }
 
+async function decodeRelative(path){
+  const res = await fetch(path, {cache:'no-store'});
+  if(!res.ok) throw new Error(I18N[currentLang].loadFailed(path, res.status));
+  const arr = await res.arrayBuffer();
+  const buf = await getCtx().decodeAudioData(arr.slice(0));
+  const blobUrl = URL.createObjectURL(new Blob([arr], {type:'audio/mpeg'}));
+  return {buffer: buf, blobUrl};
+}
+async function decodeLocalFile(file){
+  const arr = await file.arrayBuffer();
+  const buf = await getCtx().decodeAudioData(arr.slice(0));
+  const blobUrl = URL.createObjectURL(file);
+  return {buffer: buf, blobUrl};
+}
+
+function trimBuffer(buffer, seconds){
+  const ctx = getCtx();
+  const frames = Math.max(0, Math.min(buffer.length, Math.round(seconds * buffer.sampleRate)));
+  if(frames === 0) return null;
+  const out = ctx.createBuffer(buffer.numberOfChannels, frames, buffer.sampleRate);
+  for(let ch=0; ch<buffer.numberOfChannels; ch++){
+    out.copyToChannel(buffer.getChannelData(ch).subarray(0, frames), ch);
+  }
+  return out;
+}
+
+async function renderConcatArray(buffers){
+  const sampleRate = buffers[0].sampleRate;
+  const channels = 2;
+  const totalFrames = buffers.reduce((a,b) => a + b.length, 0);
+  const offline = new OfflineAudioContext(channels, totalFrames, sampleRate);
+  let offset = 0;
+  buffers.forEach(buf => {
+    const src = offline.createBufferSource();
+    src.buffer = buf;
+    src.connect(offline.destination);
+    src.start(offset / sampleRate);
+    offset += buf.length;
+  });
+  return await offline.startRendering();
+}
+
+function floatTo16(input){
+  const out = new Int16Array(input.length);
+  for(let i=0;i<input.length;i++){
+    let s = Math.max(-1, Math.min(1, input[i]));
+    out[i] = s < 0 ? s*0x8000 : s*0x7FFF;
+  }
+  return out;
+}
+
+function encodeMp3(audioBuffer, onProgress){
+  const channels = audioBuffer.numberOfChannels >= 2 ? 2 : 1;
+  const sampleRate = audioBuffer.sampleRate;
+  const encoder = new lamejs.Mp3Encoder(channels, sampleRate, 128);
+  const left = floatTo16(audioBuffer.getChannelData(0));
+  const right = channels === 2 ? floatTo16(audioBuffer.getChannelData(1)) : null;
+  const blockSize = 1152;
+  const mp3Data = [];
+  const total = left.length;
+  for(let i=0; i<total; i+=blockSize){
+    const leftChunk = left.subarray(i, i+blockSize);
+    let mp3buf;
+    if(channels === 2){
+      const rightChunk = right.subarray(i, i+blockSize);
+      mp3buf = encoder.encodeBuffer(leftChunk, rightChunk);
+    } else {
+      mp3buf = encoder.encodeBuffer(leftChunk);
+    }
+    if(mp3buf.length > 0) mp3Data.push(new Int8Array(mp3buf));
+    if(onProgress && i % (blockSize*40) === 0) onProgress(i/total);
+  }
+  const end = encoder.flush();
+  if(end.length > 0) mp3Data.push(new Int8Array(end));
+  return new Blob(mp3Data, {type:'audio/mp3'});
+}
+
+/* ================= MIX TAB LOGIC ================= */
+const state = { tts:null, song:null, outro:null };
 let ttsFiles = [];
 let outroFiles = [];
 
@@ -385,21 +555,6 @@ async function loadAll(){
   }
 }
 document.getElementById('reloadBtn').addEventListener('click', loadAll);
-
-async function decodeRelative(path){
-  const res = await fetch(path, {cache:'no-store'});
-  if(!res.ok) throw new Error(I18N[currentLang].loadFailed(path, res.status));
-  const arr = await res.arrayBuffer();
-  const buf = await getCtx().decodeAudioData(arr.slice(0));
-  const blobUrl = URL.createObjectURL(new Blob([arr], {type:'audio/mpeg'}));
-  return {buffer: buf, blobUrl};
-}
-async function decodeLocalFile(file){
-  const arr = await file.arrayBuffer();
-  const buf = await getCtx().decodeAudioData(arr.slice(0));
-  const blobUrl = URL.createObjectURL(file);
-  return {buffer: buf, blobUrl};
-}
 
 document.getElementById('ttsSelect').addEventListener('change', async (e) => {
   const statusEl = document.getElementById('ttsStatus');
@@ -483,69 +638,6 @@ function updateTimeline(){
 
 function checkReady(){ if(state.tts && state.song && state.outro) enableStep('step5'); }
 
-function trimBuffer(buffer, seconds){
-  const ctx = getCtx();
-  const frames = Math.max(0, Math.min(buffer.length, Math.round(seconds * buffer.sampleRate)));
-  if(frames === 0) return null;
-  const out = ctx.createBuffer(buffer.numberOfChannels, frames, buffer.sampleRate);
-  for(let ch=0; ch<buffer.numberOfChannels; ch++){
-    out.copyToChannel(buffer.getChannelData(ch).subarray(0, frames), ch);
-  }
-  return out;
-}
-
-async function renderConcat(ttsBuf, songBuf, outroBuf){
-  const sampleRate = ttsBuf.sampleRate;
-  const channels = 2;
-  const totalFrames = ttsBuf.length + songBuf.length + (outroBuf ? outroBuf.length : 0);
-  const offline = new OfflineAudioContext(channels, totalFrames, sampleRate);
-  function schedule(buf, offsetFrames){
-    const src = offline.createBufferSource();
-    src.buffer = buf;
-    src.connect(offline.destination);
-    src.start(offsetFrames / sampleRate);
-  }
-  schedule(ttsBuf, 0);
-  schedule(songBuf, ttsBuf.length);
-  if(outroBuf) schedule(outroBuf, ttsBuf.length + songBuf.length);
-  return await offline.startRendering();
-}
-
-function floatTo16(input){
-  const out = new Int16Array(input.length);
-  for(let i=0;i<input.length;i++){
-    let s = Math.max(-1, Math.min(1, input[i]));
-    out[i] = s < 0 ? s*0x8000 : s*0x7FFF;
-  }
-  return out;
-}
-
-function encodeMp3(audioBuffer, onProgress){
-  const channels = audioBuffer.numberOfChannels >= 2 ? 2 : 1;
-  const sampleRate = audioBuffer.sampleRate;
-  const encoder = new lamejs.Mp3Encoder(channels, sampleRate, 128);
-  const left = floatTo16(audioBuffer.getChannelData(0));
-  const right = channels === 2 ? floatTo16(audioBuffer.getChannelData(1)) : null;
-  const blockSize = 1152;
-  const mp3Data = [];
-  const total = left.length;
-  for(let i=0; i<total; i+=blockSize){
-    const leftChunk = left.subarray(i, i+blockSize);
-    let mp3buf;
-    if(channels === 2){
-      const rightChunk = right.subarray(i, i+blockSize);
-      mp3buf = encoder.encodeBuffer(leftChunk, rightChunk);
-    } else {
-      mp3buf = encoder.encodeBuffer(leftChunk);
-    }
-    if(mp3buf.length > 0) mp3Data.push(new Int8Array(mp3buf));
-    if(onProgress && i % (blockSize*40) === 0) onProgress(i/total);
-  }
-  const end = encoder.flush();
-  if(end.length > 0) mp3Data.push(new Int8Array(end));
-  return new Blob(mp3Data, {type:'audio/mp3'});
-}
-
 document.getElementById('generateBtn').addEventListener('click', async () => {
   const btn = document.getElementById('generateBtn');
   const statusEl = document.getElementById('genStatus');
@@ -567,10 +659,12 @@ document.getElementById('generateBtn').addEventListener('click', async () => {
     const songD = state.song.duration;
     const outroAllowed = Math.max(0, Math.min(state.outro.duration, MAX_SECONDS - ttsD - songD));
     const outroBuf = outroAllowed > 0 ? trimBuffer(state.outro.buffer, outroAllowed) : null;
+    const buffers = [state.tts.buffer, state.song.buffer];
+    if(outroBuf) buffers.push(outroBuf);
 
     progressBar.style.width = '20%';
     setStatus(statusEl, I18N[currentLang].mixing, 'busy');
-    const finalBuffer = await renderConcat(state.tts.buffer, state.song.buffer, outroBuf);
+    const finalBuffer = await renderConcatArray(buffers);
 
     progressBar.style.width = '45%';
     setStatus(statusEl, I18N[currentLang].encoding, 'busy');
@@ -593,10 +687,77 @@ document.getElementById('generateBtn').addEventListener('click', async () => {
   setTimeout(() => progressWrap.classList.remove('show'), 800);
 });
 
+/* ================= INTRO TAB LOGIC ================= */
+const introState = { audio1:null, audio2:null };
+
+function checkIntroReady(){ if(introState.audio1 && introState.audio2) enableStep('introStep3'); else disableStep('introStep3'); }
+
+function wireIntroUpload(pickId, inputId, nameId, statusId, previewId, key){
+  document.getElementById(pickId).addEventListener('click', () => document.getElementById(inputId).click());
+  document.getElementById(inputId).addEventListener('change', async (e) => {
+    const statusEl = document.getElementById(statusId);
+    const file = e.target.files[0];
+    if(!file) return;
+    document.getElementById(nameId).textContent = file.name;
+    setStatus(statusEl, I18N[currentLang].analyzingAudio, 'busy');
+    try{
+      const {buffer, blobUrl} = await decodeLocalFile(file);
+      introState[key] = {name:file.name, buffer, duration:buffer.duration};
+      const preview = document.getElementById(previewId);
+      preview.src = blobUrl; preview.style.display = 'block';
+      setStatus(statusEl, `${file.name} · ${fmtTime(buffer.duration)}`, 'ok');
+    }catch(err){ setStatus(statusEl, err.message, 'err'); introState[key] = null; }
+    checkIntroReady();
+  });
+}
+wireIntroUpload('introAudio1Pick','introAudio1Input','introAudio1Name','introAudio1Status','introAudio1Preview','audio1');
+wireIntroUpload('introAudio2Pick','introAudio2Input','introAudio2Name','introAudio2Status','introAudio2Preview','audio2');
+
+document.getElementById('introGenerateBtn').addEventListener('click', async () => {
+  const btn = document.getElementById('introGenerateBtn');
+  const statusEl = document.getElementById('introGenStatus');
+  const progressWrap = document.getElementById('introProgressWrap');
+  const progressBar = document.getElementById('introProgressBar');
+  const result = document.getElementById('introResult');
+
+  if(!introState.audio1 || !introState.audio2){
+    setStatus(statusEl, I18N[currentLang].introMissingSelection, 'err');
+    return;
+  }
+  btn.disabled = true;
+  result.classList.remove('show');
+  progressWrap.classList.add('show');
+  progressBar.style.width = '10%';
+  try{
+    setStatus(statusEl, I18N[currentLang].mixing, 'busy');
+    const finalBuffer = await renderConcatArray([introState.audio1.buffer, introState.audio2.buffer]);
+
+    progressBar.style.width = '45%';
+    setStatus(statusEl, I18N[currentLang].encoding, 'busy');
+    await new Promise(r => setTimeout(r, 30));
+
+    const blob = encodeMp3(finalBuffer, (p) => { progressBar.style.width = (45 + p*50) + '%'; });
+
+    progressBar.style.width = '100%';
+    const url = URL.createObjectURL(blob);
+    const nameRaw = document.getElementById('introOutName').value.trim() || I18N[currentLang].introDefaultFileName;
+    const link = document.getElementById('introDownloadLink');
+    link.href = url;
+    link.download = nameRaw.replace(/\.mp3$/i,'') + '.mp3';
+    result.classList.add('show');
+    setStatus(statusEl, I18N[currentLang].done(fmtTime(finalBuffer.duration)), 'ok');
+  }catch(err){
+    setStatus(statusEl, I18N[currentLang].error(err.message), 'err');
+  }
+  btn.disabled = false;
+  setTimeout(() => progressWrap.classList.remove('show'), 800);
+});
+
 /* ---------------- init ---------------- */
 applyLang(currentLang);
 updateTimeline();
 loadAll();
+disableStep('introStep3');
 </script>
 </body>
 </html>
