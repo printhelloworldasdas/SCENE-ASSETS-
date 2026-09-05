@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Scene Assets</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lamejs/1.2.0/lame.min.js"></script>
+<style>
+  :root{
+    --bg:#0E0D0C;
+    --panel:#18160F;
+    --panel-2:#0B0A08;
+    --border:rgba(255,255,255,.09);
+    --text:#F1EDE6;
+    --muted:#948C80;
+    --tts:#6FA98C;
+    --song:#D9A441;
+    --outro:#9A7FBF;
+    --cut:#C1554A;
+    --ok:#7FB88F;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--text);}
+  body{font-family:'Inter',system-ui,sans-serif;line-height:1.5;padding:36px 20px 80px;position:relative;}
+  body::before{
+    content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+    opacity:.05;mix-blend-mode:overlay;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+  }
+  .wrap{max-width:720px;margin:0 auto;position:relative;z-index:1;}
+  h2,h3{font-family:'Inter',sans-serif;margin:0;font-weight:600;}
+  .head{border-bottom:1px solid var(--border);padding-bottom:24px;margin-bottom:32px;display:flex;justify-content:space-between;align-items:flex-start;gap:16px;}
+  .head-text h1{font-family:'Fraunces',serif;font-size:34px;font-weight:600;color:var(--text);letter-spacing:-.01em;margin:0;}
+  .head-text p{color:var(--muted);font-size:14.5px;margin-top:10px;max-width:52ch;}
+  .mono{font-family:'IBM Plex Mono',monospace;}
+
+  .lang-toggle{display:flex;border:1px solid var(--border);border-radius:3px;overflow:hidden;flex-shrink:0;}
+  .lang-toggle button{background:var(--panel-2);color:var(--muted);border:none;border-radius:0;padding:6px 10px;font-size:12px;font-family:'IBM Plex Mono',monospace;font-weight:400;}
+  .lang-toggle button.active{background:var(--song);color:#1a1305;font-weight:500;}
+  .lang-toggle button + button{border-left:1px solid var(--border);}
+
+  .timeline-card{background:var(--panel);border:1px solid var(--border);border-radius:5px;padding:20px;margin-bottom:28px;}
+  .timeline-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:14px;}
+  .timeline-head h3{font-size:14px;color:var(--muted);font-weight:500;font-family:'Inter',sans-serif;}
+  .timeline-total{font-family:'IBM Plex Mono',monospace;font-size:14px;}
+  .timeline-total.over{color:var(--cut);}
+  .timeline-total.ok{color:var(--ok);}
+
+  .bar{position:relative;height:34px;border-radius:6px;overflow:hidden;display:flex;background:var(--panel-2);border:1px solid var(--border);}
+  .seg{height:100%;position:relative;min-width:0;transition:width .3s ease;}
+  .seg.tts{background:var(--tts);}
+  .seg.song{background:var(--song);}
+  .seg.outro{background:var(--outro);}
+  .seg.outro-cut{background-image:repeating-linear-gradient(45deg, rgba(0,0,0,.35) 0 6px, rgba(0,0,0,.15) 6px 12px);background-color:var(--outro);}
+  .legend{display:flex;gap:18px;margin-top:26px;flex-wrap:wrap;font-size:12.5px;color:var(--muted);}
+  .legend span.dot{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:6px;}
+  .legend .dot.tts{background:var(--tts);}
+  .legend .dot.song{background:var(--song);}
+  .legend .dot.outro{background:var(--outro);}
+  .trim-note{margin-top:14px;font-size:13px;color:var(--cut);display:none;}
+  .trim-note.show{display:block;}
+
+  .step{background:var(--panel);border:1px solid var(--border);border-radius:5px;padding:22px;margin-bottom:14px;}
+  .step-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px;}
+  .step-head-left{display:flex;align-items:center;gap:12px;}
+  .step-num{width:22px;height:22px;border-radius:50%;background:var(--panel-2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--muted);flex-shrink:0;}
+  .step-head h2{font-size:15.5px;font-weight:600;}
+  .step.disabled{opacity:.4;pointer-events:none;}
+
+  label{display:block;font-size:13px;color:var(--muted);margin-bottom:6px;font-family:'Inter',sans-serif;}
+  select{width:100%;background:var(--panel-2);border:1px solid var(--border);color:var(--text);border-radius:3px;padding:10px 12px;font-size:14px;font-family:'Inter',sans-serif;}
+  input[type=text]{width:100%;background:var(--panel-2);border:1px solid var(--border);color:var(--text);border-radius:3px;padding:10px 12px;font-size:14px;font-family:'Inter',sans-serif;}
+  input[type=text]:focus, select:focus{outline:none;border-color:var(--song);}
+
+  button{background:var(--song);color:#1a1305;border:none;border-radius:3px;padding:11px 18px;font-size:14px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;}
+  button:hover{filter:brightness(1.08);}
+  button:disabled{opacity:.4;cursor:not-allowed;filter:none;}
+  button.secondary{background:var(--panel-2);color:var(--text);border:1px solid var(--border);padding:8px 14px;font-size:12.5px;}
+  button.generate{width:100%;padding:14px;font-size:15px;}
+
+  .filepick{border:1.5px dashed var(--border);border-radius:4px;padding:20px;text-align:center;cursor:pointer;transition:border-color .15s;}
+  .filepick:hover{border-color:var(--song);}
+  .filepick input{display:none;}
+  .filepick .fp-name{font-family:'IBM Plex Mono',monospace;font-size:13px;color:var(--song);margin-top:6px;}
+  .filepick .fp-hint{font-size:13px;color:var(--muted);}
+
+  audio{width:100%;margin-top:12px;height:34px;}
+
+  .status{font-size:13px;margin-top:10px;font-family:'IBM Plex Mono',monospace;}
+  .status.err{color:var(--cut);}
+  .status.ok{color:var(--ok);}
+  .status.busy{color:var(--muted);}
+
+  .progress-wrap{margin-top:14px;height:6px;border-radius:3px;background:var(--panel-2);overflow:hidden;display:none;}
+  .progress-wrap.show{display:block;}
+  .progress-bar{height:100%;width:0%;background:var(--song);transition:width .15s linear;}
+
+  .result{margin-top:16px;display:none;}
+  .result.show{display:block;}
+  .result a{display:inline-block;background:var(--ok);color:#08131a;text-decoration:none;padding:11px 18px;border-radius:6px;font-weight:600;font-size:14px;}
+
+  .field-name{margin-bottom:18px;}
+  details{margin-top:10px;}
+  details summary{font-size:12.5px;color:var(--muted);cursor:pointer;font-family:'IBM Plex Mono',monospace;}
+  details .box{margin-top:10px;background:rgba(14,20,31,.7);border:1px solid rgba(255,255,255,.09);border-radius:6px;padding:12px;font-size:12.5px;color:var(--muted);}
+  details code{color:var(--tts);}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="head">
+    <div class="head-text">
+      <h1>Scene Assets</h1>
+      <p data-i18n="tagline">Chain the announcement, your song, and the outro into one mp3 for your Roblox experience. If the mix runs past 7 minutes, the outro gets trimmed to fit.</p>
+    </div>
+    <div class="lang-toggle" id="langToggle">
+      <button data-lang="en">EN</button>
+      <button data-lang="es">ES</button>
+    </div>
+  </div>
+
+  <div class="timeline-card">
+    <div class="timeline-head">
+      <h3 data-i18n="timelineHeading">Timeline</h3>
+      <span id="totalLabel" class="timeline-total mono">00:00 / 07:00</span>
+    </div>
+    <div class="bar" id="bar">
+      <div class="seg tts" id="segTts" style="width:0%"></div>
+      <div class="seg song" id="segSong" style="width:0%"></div>
+      <div class="seg outro" id="segOutro" style="width:0%"></div>
+    </div>
+    <div class="legend">
+      <span><i class="dot tts"></i>TTS</span>
+      <span><i class="dot song"></i><span data-i18n="legendSong">Your song</span></span>
+      <span><i class="dot outro"></i>Outro</span>
+    </div>
+    <div class="trim-note mono" id="trimNote"></div>
+  </div>
+
+  <!-- STEP 1: auto-load from repo -->
+  <div class="step" id="step1">
+    <div class="step-head">
+      <div class="step-head-left"><div class="step-num">1</div><h2 data-i18n="step1Title">Repository audio</h2></div>
+      <button class="secondary" id="reloadBtn" data-i18n="reloadBtn">Reload</button>
+    </div>
+    <div class="status" id="loadStatus"></div>
+    <details>
+      <summary data-i18n="detailsSummary">How is this organized in the repository?</summary>
+      <div class="box" id="detailsBox"></div>
+    </details>
+  </div>
+
+  <!-- STEP 2 -->
+  <div class="step disabled" id="step2">
+    <div class="step-head"><div class="step-head-left"><div class="step-num">2</div><h2 data-i18n="step2Title">Choose the TTS</h2></div></div>
+    <select id="ttsSelect"></select>
+    <audio id="ttsPreview" controls style="display:none;"></audio>
+    <div class="status" id="ttsStatus"></div>
+  </div>
+
+  <!-- STEP 3 -->
+  <div class="step disabled" id="step3">
+    <div class="step-head"><div class="step-head-left"><div class="step-num">3</div><h2 data-i18n="step3Title">Upload your song</h2></div></div>
+    <div class="filepick" id="songPick">
+      <input type="file" id="songInput" accept="audio/*">
+      <div class="fp-hint" data-i18n="filepickHint">Click to choose an mp3/wav</div>
+      <div class="fp-name" id="songName"></div>
+    </div>
+    <audio id="songPreview" controls style="display:none;"></audio>
+    <div class="status" id="songStatus"></div>
+  </div>
+
+  <!-- STEP 4 -->
+  <div class="step disabled" id="step4">
+    <div class="step-head"><div class="step-head-left"><div class="step-num">4</div><h2 data-i18n="step4Title">Choose the outro</h2></div></div>
+    <select id="outroSelect"></select>
+    <audio id="outroPreview" controls style="display:none;"></audio>
+    <div class="status" id="outroStatus"></div>
+  </div>
+
+  <!-- STEP 5 -->
+  <div class="step disabled" id="step5">
+    <div class="step-head"><div class="step-head-left"><div class="step-num">5</div><h2 data-i18n="step5Title">Generate final mp3</h2></div></div>
+    <div class="field-name">
+      <label data-i18n="outNameLabel">File name</label>
+      <input type="text" id="outName" value="roblox_mix">
+    </div>
+    <button class="generate" id="generateBtn" data-i18n="generateBtn">Generate and download</button>
+    <div class="progress-wrap" id="progressWrap"><div class="progress-bar" id="progressBar"></div></div>
+    <div class="status" id="genStatus"></div>
+    <div class="result" id="result">
+      <a id="downloadLink" download="roblox_mix.mp3" data-i18n="downloadLink">Download mp3</a>
+    </div>
+  </div>
+
+</div>
+
+<script>
+/* ---------------- i18n ---------------- */
+const I18N = {
+  en: {
+    tagline: "Chain the announcement, your song, and the outro into one mp3 for your Roblox experience. If the mix runs past 7 minutes, the outro gets trimmed to fit.",
+    timelineHeading: "Timeline",
+    legendSong: "Your song",
+    step1Title: "Repository audio",
+    reloadBtn: "Reload",
+    detailsSummary: "How is this organized in the repository?",
+    detailsBoxHtml:
+      'This page expects two folders next to it:<br>' +
+      '<code>tts/</code> with your TTS mp3s plus a <code>tts/manifest.json</code><br>' +
+      '<code>outro/</code> with your outro mp3s plus an <code>outro/manifest.json</code><br><br>' +
+      'Each <code>manifest.json</code> is just a list of names, for example:<br>' +
+      '<code>["announcement1.mp3", "announcement2.mp3"]</code><br><br>' +
+      'Every time you add a new mp3 to a folder, add its name to that manifest.json and press "Reload".',
+    step2Title: "Choose the TTS",
+    step3Title: "Upload your song",
+    filepickHint: "Click to choose an mp3/wav",
+    step4Title: "Choose the outro",
+    step5Title: "Generate final mp3",
+    outNameLabel: "File name",
+    generateBtn: "Generate and download",
+    downloadLink: "Download mp3",
+    selectPlaceholder: "— select a file —",
+    loading: "Loading…",
+    manifestMissing: (dir) => `Can't find ${dir}/manifest.json (does the "${dir}/" folder exist with its manifest?)`,
+    manifestNotArray: (dir) => `${dir}/manifest.json should be a list of names, e.g. ["a.mp3","b.mp3"]`,
+    manifestEmpty: "One of the two manifest.json files is empty.",
+    manifestReady: (t,o) => `Ready: ${t} TTS, ${o} outro files available.`,
+    loadFailed: (path, status) => `Could not load ${path} (${status}).`,
+    analyzingSong: "Analyzing your song…",
+    trimmed: (kept, full) => `The mix was over 7:00, so the outro is trimmed to ${kept} (from ${full}).`,
+    noRoomForOutro: "The TTS + your song already add up to more than 7:00, so there won't be room for the outro.",
+    missingSelection: "You still need to choose a TTS, song, and outro.",
+    calcDuration: "Calculating final duration…",
+    mixing: "Mixing tracks…",
+    encoding: "Encoding to mp3 (this can take a few seconds)…",
+    done: (d) => `Done · final duration ${d}`,
+    error: (msg) => `Error: ${msg}`,
+    defaultFileName: "roblox_mix"
+  },
+  es: {
+    tagline: "Encadena el aviso, tu canción y el cierre en un solo mp3 para tu experiencia de Roblox. Si la mezcla pasa de 7 minutos, recorta el cierre para que quepa.",
+    timelineHeading: "Línea de tiempo",
+    legendSong: "Tu canción",
+    step1Title: "Audios del repositorio",
+    reloadBtn: "Recargar",
+    detailsSummary: "¿Cómo se organiza esto en el repositorio?",
+    detailsBoxHtml:
+      'Esta página espera, junto a ella, dos carpetas:<br>' +
+      '<code>tts/</code> con tus mp3 de TTS + un <code>tts/manifest.json</code><br>' +
+      '<code>outro/</code> con tus mp3 de outro + un <code>outro/manifest.json</code><br><br>' +
+      'Cada <code>manifest.json</code> es solo una lista de nombres, por ejemplo:<br>' +
+      '<code>["aviso1.mp3", "aviso2.mp3"]</code><br><br>' +
+      'Cada vez que subas un mp3 nuevo a una carpeta, añade su nombre a ese manifest.json y pulsa "Recargar".',
+    step2Title: "Elige el TTS",
+    step3Title: "Sube tu canción",
+    filepickHint: "Haz clic para elegir un mp3/wav",
+    step4Title: "Elige el outro",
+    step5Title: "Generar mp3 final",
+    outNameLabel: "Nombre del archivo",
+    generateBtn: "Generar y descargar",
+    downloadLink: "Descargar mp3",
+    selectPlaceholder: "— selecciona un archivo —",
+    loading: "Cargando…",
+    manifestMissing: (dir) => `No encuentro ${dir}/manifest.json (¿existe la carpeta "${dir}/" con su manifest?)`,
+    manifestNotArray: (dir) => `${dir}/manifest.json debería ser una lista de nombres, ej: ["a.mp3","b.mp3"]`,
+    manifestEmpty: "Alguno de los dos manifest.json está vacío.",
+    manifestReady: (t,o) => `Listo: ${t} TTS, ${o} outros disponibles.`,
+    loadFailed: (path, status) => `No se pudo cargar ${path} (${status}).`,
+    analyzingSong: "Analizando tu canción…",
+    trimmed: (kept, full) => `La mezcla pasaba de 7:00, así que el outro se recorta a ${kept} (de ${full}).`,
+    noRoomForOutro: "El TTS + tu canción ya suman más de 7:00, así que no habrá espacio para el outro.",
+    missingSelection: "Falta elegir TTS, canción u outro.",
+    calcDuration: "Calculando duración final…",
+    mixing: "Mezclando pistas…",
+    encoding: "Codificando a mp3 (puede tardar unos segundos)…",
+    done: (d) => `Listo · duración final ${d}`,
+    error: (msg) => `Error: ${msg}`,
+    defaultFileName: "mezcla_roblox"
+  }
+};
+
+function detectLang(){
+  const nav = (navigator.language || (navigator.languages && navigator.languages[0]) || 'en').toLowerCase();
+  return nav.startsWith('es') ? 'es' : 'en';
+}
+
+let currentLang = detectLang();
+
+function applyLang(lang){
+  currentLang = lang;
+  const dict = I18N[lang];
+  document.documentElement.lang = lang;
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    if(dict[key] !== undefined) el.textContent = dict[key];
+  });
+  document.getElementById('detailsBox').innerHTML = dict.detailsBoxHtml;
+  document.querySelectorAll('#ttsSelect, #outroSelect').forEach(sel => {
+    const first = sel.querySelector('option[value=""]');
+    if(first) first.textContent = dict.selectPlaceholder;
+  });
+  document.getElementById('loadStatus').textContent = dict.loading;
+  document.querySelectorAll('#langToggle button').forEach(b => {
+    b.classList.toggle('active', b.getAttribute('data-lang') === lang);
+  });
+  const outName = document.getElementById('outName');
+  if(!outName.dataset.userEdited) outName.value = dict.defaultFileName;
+  const dlLink = document.getElementById('downloadLink');
+  dlLink.download = (outName.value || dict.defaultFileName) + '.mp3';
+}
+
+document.getElementById('outName').addEventListener('input', (e) => { e.target.dataset.userEdited = '1'; });
+
+document.querySelectorAll('#langToggle button').forEach(btn => {
+  btn.addEventListener('click', () => applyLang(btn.getAttribute('data-lang')));
+});
+
+/* ---------------- app ---------------- */
+const MAX_SECONDS = 7 * 60;
+const TTS_DIR = 'tts';
+const OUTRO_DIR = 'outro';
+
+let audioCtx = null;
+function getCtx(){
+  if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)({sampleRate:44100});
+  if(audioCtx.state === 'suspended') audioCtx.resume();
+  return audioCtx;
+}
+
+const state = { tts:null, song:null, outro:null };
+
+function fmtTime(s){
+  s = Math.max(0, Math.round(s));
+  const m = Math.floor(s/60);
+  const sec = s%60;
+  return String(m).padStart(2,'0')+':'+String(sec).padStart(2,'0');
+}
+function setStatus(el, msg, cls){ el.textContent = msg; el.className = 'status' + (cls ? ' '+cls : ''); }
+function enableStep(id){ document.getElementById(id).classList.remove('disabled'); }
+function disableStep(id){ document.getElementById(id).classList.add('disabled'); }
+
+let ttsFiles = [];
+let outroFiles = [];
+
+function fillSelect(selectEl, items){
+  selectEl.innerHTML = `<option value="">${I18N[currentLang].selectPlaceholder}</option>`;
+  items.forEach((name, i) => {
+    const opt = document.createElement('option');
+    opt.value = i;
+    opt.textContent = name;
+    selectEl.appendChild(opt);
+  });
+}
+
+async function loadManifest(dir){
+  const res = await fetch(dir + '/manifest.json', {cache:'no-store'});
+  if(!res.ok) throw new Error(I18N[currentLang].manifestMissing(dir));
+  const data = await res.json();
+  if(!Array.isArray(data)) throw new Error(I18N[currentLang].manifestNotArray(dir));
+  return data.filter(n => /\.mp3$/i.test(n));
+}
+
+async function loadAll(){
+  const statusEl = document.getElementById('loadStatus');
+  setStatus(statusEl, I18N[currentLang].loading, 'busy');
+  disableStep('step2'); disableStep('step3'); disableStep('step4'); disableStep('step5');
+  try{
+    const [t, o] = await Promise.all([loadManifest(TTS_DIR), loadManifest(OUTRO_DIR)]);
+    if(t.length === 0 || o.length === 0){
+      setStatus(statusEl, I18N[currentLang].manifestEmpty, 'err');
+      return;
+    }
+    ttsFiles = t;
+    outroFiles = o;
+    fillSelect(document.getElementById('ttsSelect'), ttsFiles);
+    fillSelect(document.getElementById('outroSelect'), outroFiles);
+    setStatus(statusEl, I18N[currentLang].manifestReady(t.length, o.length), 'ok');
+    enableStep('step2'); enableStep('step3'); enableStep('step4');
+  }catch(err){
+    setStatus(statusEl, err.message, 'err');
+  }
+}
+document.getElementById('reloadBtn').addEventListener('click', loadAll);
+
+async function decodeRelative(path){
+  const res = await fetch(path, {cache:'no-store'});
+  if(!res.ok) throw new Error(I18N[currentLang].loadFailed(path, res.status));
+  const arr = await res.arrayBuffer();
+  const buf = await getCtx().decodeAudioData(arr.slice(0));
+  const blobUrl = URL.createObjectURL(new Blob([arr], {type:'audio/mpeg'}));
+  return {buffer: buf, blobUrl};
+}
+async function decodeLocalFile(file){
+  const arr = await file.arrayBuffer();
+  const buf = await getCtx().decodeAudioData(arr.slice(0));
+  const blobUrl = URL.createObjectURL(file);
+  return {buffer: buf, blobUrl};
+}
+
+document.getElementById('ttsSelect').addEventListener('change', async (e) => {
+  const statusEl = document.getElementById('ttsStatus');
+  const idx = e.target.value;
+  if(idx === ''){ state.tts = null; updateTimeline(); return; }
+  const name = ttsFiles[idx];
+  setStatus(statusEl, I18N[currentLang].loading, 'busy');
+  try{
+    const {buffer, blobUrl} = await decodeRelative(TTS_DIR+'/'+name);
+    state.tts = {name, buffer, duration:buffer.duration};
+    const preview = document.getElementById('ttsPreview');
+    preview.src = blobUrl; preview.style.display = 'block';
+    setStatus(statusEl, `${name} · ${fmtTime(buffer.duration)}`, 'ok');
+  }catch(err){ setStatus(statusEl, err.message, 'err'); state.tts = null; }
+  updateTimeline(); checkReady();
+});
+
+document.getElementById('outroSelect').addEventListener('change', async (e) => {
+  const statusEl = document.getElementById('outroStatus');
+  const idx = e.target.value;
+  if(idx === ''){ state.outro = null; updateTimeline(); return; }
+  const name = outroFiles[idx];
+  setStatus(statusEl, I18N[currentLang].loading, 'busy');
+  try{
+    const {buffer, blobUrl} = await decodeRelative(OUTRO_DIR+'/'+name);
+    state.outro = {name, buffer, duration:buffer.duration};
+    const preview = document.getElementById('outroPreview');
+    preview.src = blobUrl; preview.style.display = 'block';
+    setStatus(statusEl, `${name} · ${fmtTime(buffer.duration)}`, 'ok');
+  }catch(err){ setStatus(statusEl, err.message, 'err'); state.outro = null; }
+  updateTimeline(); checkReady();
+});
+
+document.getElementById('songPick').addEventListener('click', () => document.getElementById('songInput').click());
+document.getElementById('songInput').addEventListener('change', async (e) => {
+  const statusEl = document.getElementById('songStatus');
+  const file = e.target.files[0];
+  if(!file) return;
+  document.getElementById('songName').textContent = file.name;
+  setStatus(statusEl, I18N[currentLang].analyzingSong, 'busy');
+  try{
+    const {buffer, blobUrl} = await decodeLocalFile(file);
+    state.song = {name:file.name, buffer, duration:buffer.duration};
+    const preview = document.getElementById('songPreview');
+    preview.src = blobUrl; preview.style.display = 'block';
+    setStatus(statusEl, `${file.name} · ${fmtTime(buffer.duration)}`, 'ok');
+  }catch(err){ setStatus(statusEl, err.message, 'err'); state.song = null; }
+  updateTimeline(); checkReady();
+});
+
+function updateTimeline(){
+  const ttsD = state.tts ? state.tts.duration : 0;
+  const songD = state.song ? state.song.duration : 0;
+  const outroD = state.outro ? state.outro.duration : 0;
+  const rawTotal = ttsD + songD + outroD;
+  const outroKept = Math.max(0, Math.min(outroD, MAX_SECONDS - ttsD - songD));
+  const finalTotal = ttsD + songD + outroKept;
+  const scaleMax = Math.max(rawTotal, MAX_SECONDS, 1);
+
+  document.getElementById('segTts').style.width = (ttsD/scaleMax*100)+'%';
+  document.getElementById('segSong').style.width = (songD/scaleMax*100)+'%';
+  const segOutro = document.getElementById('segOutro');
+  segOutro.style.width = (outroD/scaleMax*100)+'%';
+  segOutro.className = 'seg ' + (outroKept < outroD ? 'outro-cut' : 'outro');
+
+  const totalLabel = document.getElementById('totalLabel');
+  totalLabel.textContent = fmtTime(finalTotal) + ' / ' + fmtTime(MAX_SECONDS);
+  totalLabel.className = 'timeline-total mono ' + (rawTotal > MAX_SECONDS ? 'over' : 'ok');
+
+  const note = document.getElementById('trimNote');
+  if(outroKept < outroD && outroD > 0){
+    note.textContent = I18N[currentLang].trimmed(fmtTime(outroKept), fmtTime(outroD));
+    note.classList.add('show');
+  } else if(ttsD + songD > MAX_SECONDS){
+    note.textContent = I18N[currentLang].noRoomForOutro;
+    note.classList.add('show');
+  } else {
+    note.classList.remove('show');
+  }
+}
+
+function checkReady(){ if(state.tts && state.song && state.outro) enableStep('step5'); }
+
+function trimBuffer(buffer, seconds){
+  const ctx = getCtx();
+  const frames = Math.max(0, Math.min(buffer.length, Math.round(seconds * buffer.sampleRate)));
+  if(frames === 0) return null;
+  const out = ctx.createBuffer(buffer.numberOfChannels, frames, buffer.sampleRate);
+  for(let ch=0; ch<buffer.numberOfChannels; ch++){
+    out.copyToChannel(buffer.getChannelData(ch).subarray(0, frames), ch);
+  }
+  return out;
+}
+
+async function renderConcat(ttsBuf, songBuf, outroBuf){
+  const sampleRate = ttsBuf.sampleRate;
+  const channels = 2;
+  const totalFrames = ttsBuf.length + songBuf.length + (outroBuf ? outroBuf.length : 0);
+  const offline = new OfflineAudioContext(channels, totalFrames, sampleRate);
+  function schedule(buf, offsetFrames){
+    const src = offline.createBufferSource();
+    src.buffer = buf;
+    src.connect(offline.destination);
+    src.start(offsetFrames / sampleRate);
+  }
+  schedule(ttsBuf, 0);
+  schedule(songBuf, ttsBuf.length);
+  if(outroBuf) schedule(outroBuf, ttsBuf.length + songBuf.length);
+  return await offline.startRendering();
+}
+
+function floatTo16(input){
+  const out = new Int16Array(input.length);
+  for(let i=0;i<input.length;i++){
+    let s = Math.max(-1, Math.min(1, input[i]));
+    out[i] = s < 0 ? s*0x8000 : s*0x7FFF;
+  }
+  return out;
+}
+
+function encodeMp3(audioBuffer, onProgress){
+  const channels = audioBuffer.numberOfChannels >= 2 ? 2 : 1;
+  const sampleRate = audioBuffer.sampleRate;
+  const encoder = new lamejs.Mp3Encoder(channels, sampleRate, 128);
+  const left = floatTo16(audioBuffer.getChannelData(0));
+  const right = channels === 2 ? floatTo16(audioBuffer.getChannelData(1)) : null;
+  const blockSize = 1152;
+  const mp3Data = [];
+  const total = left.length;
+  for(let i=0; i<total; i+=blockSize){
+    const leftChunk = left.subarray(i, i+blockSize);
+    let mp3buf;
+    if(channels === 2){
+      const rightChunk = right.subarray(i, i+blockSize);
+      mp3buf = encoder.encodeBuffer(leftChunk, rightChunk);
+    } else {
+      mp3buf = encoder.encodeBuffer(leftChunk);
+    }
+    if(mp3buf.length > 0) mp3Data.push(new Int8Array(mp3buf));
+    if(onProgress && i % (blockSize*40) === 0) onProgress(i/total);
+  }
+  const end = encoder.flush();
+  if(end.length > 0) mp3Data.push(new Int8Array(end));
+  return new Blob(mp3Data, {type:'audio/mp3'});
+}
+
+document.getElementById('generateBtn').addEventListener('click', async () => {
+  const btn = document.getElementById('generateBtn');
+  const statusEl = document.getElementById('genStatus');
+  const progressWrap = document.getElementById('progressWrap');
+  const progressBar = document.getElementById('progressBar');
+  const result = document.getElementById('result');
+
+  if(!state.tts || !state.song || !state.outro){
+    setStatus(statusEl, I18N[currentLang].missingSelection, 'err');
+    return;
+  }
+  btn.disabled = true;
+  result.classList.remove('show');
+  progressWrap.classList.add('show');
+  progressBar.style.width = '5%';
+  try{
+    setStatus(statusEl, I18N[currentLang].calcDuration, 'busy');
+    const ttsD = state.tts.duration;
+    const songD = state.song.duration;
+    const outroAllowed = Math.max(0, Math.min(state.outro.duration, MAX_SECONDS - ttsD - songD));
+    const outroBuf = outroAllowed > 0 ? trimBuffer(state.outro.buffer, outroAllowed) : null;
+
+    progressBar.style.width = '20%';
+    setStatus(statusEl, I18N[currentLang].mixing, 'busy');
+    const finalBuffer = await renderConcat(state.tts.buffer, state.song.buffer, outroBuf);
+
+    progressBar.style.width = '45%';
+    setStatus(statusEl, I18N[currentLang].encoding, 'busy');
+    await new Promise(r => setTimeout(r, 30));
+
+    const blob = encodeMp3(finalBuffer, (p) => { progressBar.style.width = (45 + p*50) + '%'; });
+
+    progressBar.style.width = '100%';
+    const url = URL.createObjectURL(blob);
+    const nameRaw = document.getElementById('outName').value.trim() || I18N[currentLang].defaultFileName;
+    const link = document.getElementById('downloadLink');
+    link.href = url;
+    link.download = nameRaw.replace(/\.mp3$/i,'') + '.mp3';
+    result.classList.add('show');
+    setStatus(statusEl, I18N[currentLang].done(fmtTime(finalBuffer.duration)), 'ok');
+  }catch(err){
+    setStatus(statusEl, I18N[currentLang].error(err.message), 'err');
+  }
+  btn.disabled = false;
+  setTimeout(() => progressWrap.classList.remove('show'), 800);
+});
+
+/* ---------------- init ---------------- */
+applyLang(currentLang);
+updateTimeline();
+loadAll();
+</script>
+</body>
+</html>
